@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speech-to-Text Example</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+
+    #output {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Speech-to-Text Example</h1>
+  <button onclick="startSpeechRecognition()">Start Speaking</button>
+  <div id="output"></div>
+
+  <script>
+    function startSpeechRecognition() {
+      // Check if the browser supports the Web Speech API
+      if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+        var recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+
+        recognition.onstart = function() {
+          console.log('Speech recognition started');
+        };
+
+        recognition.onresult = function(event) {
+          var transcript = event.results[0][0].transcript;
+          displayText(transcript);
+        };
+
+        recognition.onerror = function(event) {
+          console.error('Speech recognition error:', event.error);
+        };
+
+        recognition.onend = function() {
+          console.log('Speech recognition ended');
+        };
+
+        recognition.start();
+      } else {
+        alert('Speech recognition is not supported in this browser.');
+      }
+    }
+
+    function displayText(text) {
+      var outputElement = document.getElementById('output');
+      outputElement.textContent = 'You said: ' + text;
+    }
+  </script>
+</body>
+</html>
