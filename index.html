@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<title>Firmware V4.8</title>
+	    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+        .calendar-container {
+            background: rgba(0, 26, 51, 0.2);
+            backdrop-filter: blur(5px);
+            width: 280px;
+            border-bottom: 1px solid #ccffff;  
+            position:fixed;
+			right:0;
+			top:0;
+        }
+        
+        .calendar-container header {
+            display: flex;
+            align-items: center;
+            padding: 25px 30px 10px;
+            justify-content: space-between;
+        }
+        
+        header .calendar-navigation {
+            display: flex;
+        }
+        
+        header .calendar-navigation span {
+            height: 38px;
+            width: 38px;
+            margin: 0 1px;
+            cursor: pointer;
+            text-align: center;
+            line-height: 38px;
+            border-radius: 50%;
+            user-select: none;
+            color: transparent;
+            font-size: 17px;
+            -webkit-text-stroke: 0.5px #ccffff;
+        }
+        
+        .calendar-navigation span:last-child {
+            margin-right: -10px;
+        }
+        
+        header .calendar-navigation span:hover {
+            background: transparent;
+            border-radius: 50%;
+            border: 2px solid #ccffff;
+            color: transparent;
+
+        }
+        
+        header .calendar-current-date {
+            font-weight: 500;
+            font-size: 25px;
+            color: transparent;
+-webkit-text-stroke: 0.5px #ccffff;
+text-align: center;
+        }
+        
+        .calendar-body {
+            padding: 20px;
+        }
+        
+        .calendar-body ul {
+            list-style: none;
+            flex-wrap: wrap;
+            display: flex;
+            text-align: center;
+        }
+        
+        .calendar-body .calendar-dates {
+            margin-bottom: 20px;
+        }
+        
+        .calendar-body li {
+            width: calc(100% / 7);
+            font-size: 15px;
+            color: transparent;
+            -webkit-text-stroke: 0.5px #ccffff;
+        }
+        
+        .calendar-body .calendar-weekdays li {
+            cursor: default;
+            font-weight: 500;
+        }
+        
+        .calendar-body .calendar-dates li {
+            margin-top: 30px;
+            position: relative;
+            z-index: 1;
+            cursor: pointer;
+        }
+        
+        .calendar-dates li.inactive {
+            color: transparent;
+            -webkit-text-stroke: 0.5px #ccffff;
+        }
+        
+        .calendar-dates li.active {
+            color: transparent;
+            -webkit-text-stroke: 0.5px #ccffff;
+        }
+        
+        .calendar-dates li::before {
+            position: absolute;
+            content: "";
+            z-index: -1;
+            top: 50%;
+            left: 50%;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .calendar-dates li.active::before {
+            background: transparent;
+            border-radius: 50%;
+            border: 1px solid #ccffff;
+        }
+        
+        .calendar-dates li:not(.active):hover::before {
+            background: transparent;
+            border-radius: 25%;
+            border: 1px solid #ccffff;
+        }
+        .searchholder{
+        	justify-content: center;
+        	display: flex;
+        	margin-top: 200px;
+        }
+    </style>
+	<style type="text/css">
+		body{
+			background: url("background.jpg");
+			background-size: 100%;
+			background-repeat: no-repeat;	
+				}
+		#cltxt{
+			color: #333;
+		    text-shadow: 0 0 20px #33cccc, 0 0 30px #33cccc, 0 0 40px #33cccc, 0 0 50px #33cccc, 0 0 60px #33cccc, 0 0 70px #33cccc, 0 0 80px #33cccc;
+			-webkit-text-stroke: 3px #00ccff;
+			text-shadow: ;
+			font-family: arial;
+			font-weight: bold;
+			font-size: 80px;
+			text-align: left;
+			position: fixed;
+			top:0;
+			left: 0;
+			margin: 50px;
+		}
+		.right{
+			background: rgba(0, 26, 51, 0.4);
+			position:fixed;
+			right:0;
+			top:0;
+			height: 100%;
+		}
+		.classcontent{
+			position:fixed;
+			top: 0;
+			left: 0;
+			margin-top: 500px;
+			margin-left: 0px;
+			width: 100%;
+			height: 100%;
+			background: transparent;
+		}
+		#news{
+			width: 100%;
+			height: 94%;
+		}
+        #searchengine{
+            width: 100%;
+            height: 94%;
+        }
+		#search{
+			background: rgba(0, 26, 51, 0.5);
+			color:#ccffff;
+			padding: 10px 10px;
+			font-size: 35px;
+			border-radius: 12.5px;
+			border: 1px solid #ccffff;
+			text-align: center;
+			box-shadow: 0 0 20px #33cccc, 0 0 5px #33cccc, 0 0 5px #33cccc, 0 0 5px #33cccc, 0 0 5px #33cccc, 0 0 5px #33cccc, 0 0 5px #33cccc;
+			placeholder-color: blue;
+            backdrop-filter: blur(5px);
+		}
+		#search:hover{
+			box-shadow: 0 0 20px #33cccc, 0 0 25px #33cccc, 0 0 25px #33cccc, 0 0 25px #33cccc, 0 0 25px #33cccc, 0 0 25px #33cccc, 0 0 25px #33cccc;
+			transition: 0.2s ease;
+		}
+		::placeholder {
+          color: #33cccc;
+          opacity: 1; /* Firefox */
+        }
+
+        ::-ms-input-placeholder { /* Edge 12-18 */
+          color: #33cccc;
+        }
+		::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px #ccffff; 
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #33cccc; 
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #ccffff; 
+}
+	</style>
+	<style type="text/css">
+		.buttoncontainer{
+			justify-content: center;
+			display: flex;
+			width: 100%;
+			height: auto;
+			background:transparent;
+			border-radius: 25px;
+			padding: 25px 25px;
+			margin-top: -30px;
+		}
+		.bbutton{
+			width: 110px;
+			height: 145px;
+			margin: 15px;
+			border: 2px solid white;
+			border-radius: 25px;
+			text-align: center;
+			background: rgba(17, 17, 17, 0.6);
+            backdrop-filter: blur(8px);
+		}
+		.bbutton:hover{
+			width: 110px;
+			height: 145px;
+			margin: 15px;
+			border: 2px solid white;
+			border-radius: 25px;
+			text-align: center;
+			background: rgba(17, 17, 17, 0.8);
+			box-shadow: 0 0 20px #33cccc, 0 0 20px #33cccc, 0 0 20px #33cccc;
+			transition: 0.2s ease;
+            backdrop-filter: blur(8px);
+		}
+		#btnicns{
+			width: 100px;
+			height: 100px;
+			margin-top: 5px;
+		}
+		#btnnm{
+			color: white;
+			font-family: arial;
+			font-style: normal;
+            text-align: center;
+            text-decoration: none;
+            font-size: 20px;
+		}
+		#bbtnxt{
+			font-size: 30px;
+			font-family: arial;
+			font-weight: lighter;
+			text-align: center;
+			color: white;
+			-webkit-text-stroke: 0.0005px black;
+			background: rgba(0, 0, 0, 0.8);
+			border-radius: 10px;
+			width: 100px;
+			padding: 2.5px 2.5px;
+		}
+		#titolo{
+			color: rgba(17, 17, 17, 0.8);
+			font-family: sans-serif;
+			text-align: center;
+			font-size: 60px;
+			margin-top: 20px;
+			-webkit-text-stroke: 1px white;
+		}
+	</style>
+	<style type="text/css">
+		.window{
+			position: fixed;
+			top: 0;
+			left: 0;
+			margin: 50px;
+			border: 3px solid #33cccc;
+			width: 94%;
+			height: 90%;
+			background: rgba(17, 17, 17, 0.7);
+            backdrop-filter: blur(2.5px);
+            animation: fadeInOut 0.5s ease-in-out;
+		}
+        @keyframes fadeInOut {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+		.titbar{
+			border-bottom: 3px solid #33cccc;
+			width: 100%;
+			}
+		#tbxt{
+			color: #33cccc;
+			text-align: center;
+			font-size: 30px;
+			font-weight: lighter;
+			margin-top: -30px;
+		}
+		#closebtn{
+			color: #33cccc;
+			text-align: left;
+			text-decoration: none;
+			font-size: 30px;
+			margin-left: 2px;
+		}
+		#home-container{
+			display: none;
+		}
+		#news-container{
+			display: none;
+		}
+		#Reminders-container{
+			display: none;
+		}
+		#Maps-container{
+			display: none;
+		}
+		#Sec-container{
+			display: none;
+		}
+		#events-container{
+			display: none;
+		}
+        #search-container{
+            display: none;
+        }
+        #Terminal-container{
+            display: none;
+        }
+        #Program-container{
+            display: none;
+        }
+		#BGVID{
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+		}
+	</style>
+</head>
+
+<body onload="updateTime()">
+<h1 id="cltxt"></h1>
+<div class="searchholder">
+    <form onsubmit="return processInput(event)">
+	<input type="text" placeholder="검색 / CMD" name="q" id="search" required />
+    <button type="submit"></button>
+</form>
+</div>
+<script type="text/javascript">
+    function processInput(event) {
+        // Get the input value
+        var inputValue = document.getElementById('search').value.toLowerCase();
+        var outputElement = document.getElementById('output');
+        var terminalInput = document.getElementById("input");
+        
+        // Check for commands
+        if (inputValue === 'terminal.cmd') {
+            // If it's a command, show the Terminal container or perform any other action
+            document.getElementById('Terminal-container').style.display = 'block';
+           
+        terminalInput.focus();
+
+        } else if (inputValue === 'program.cmd') {
+            // If it's a command, show the Program container or perform any other action
+            document.getElementById('Program-container').style.display = 'block';
+        } else if (inputValue === 'restart.cmd') {
+            // If it's a command, reload the page
+            location.reload();
+        } else {
+            // If it's not a command, treat it as a search query
+            searchGoogle();
+        }
+
+        // Clear the input field
+        document.getElementById('search').value = '';
+
+        // Prevent the default form submission behavior
+        event.preventDefault();
+    }
+
+    function searchGoogle() {
+        var query = document.getElementById("search").value;
+        var url = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
+        
+        // Open the search container and set the iframe source
+        document.getElementById("search-container").style.display = "block";
+        document.getElementById("searchengine").src = url;
+    }
+</script>
+
+</script>
+<script>
+        function updateTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = now.getMinutes();
+            const meridiem = hours >= 12 ? '오후' : '오전';
+
+            // Convert to 12-hour format
+            hours = hours % 12 || 12;
+
+            const formattedTime = ` ${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes}${meridiem}`;
+            document.getElementById("cltxt").innerText = formattedTime;
+        }
+
+        // Update time initially and every minute
+        updateTime();
+        setInterval(updateTime, 10); // Update every minute
+    </script>
+<h1 id="titolo">시스템 4.8</h1>
+	    <div class="calendar-container">
+        <header class="calendar-header">
+            <p class="calendar-current-date"></p>
+            <div class="calendar-navigation">
+                <span id="calendar-prev" class="material-symbols-rounded"> < </span>
+                <span id="calendar-next" class="material-symbols-rounded"> > </span>
+            </div>
+        </header>
+        <div class="calendar-body">
+            <ul class="calendar-weekdays">
+                <li>일</li>
+                <li>월</li>
+                <li>화</li>
+                <li>수</li>
+                <li>목</li>
+                <li>금</li>
+                <li>토</li>
+            </ul>
+            <ul class="calendar-dates"></ul>
+        </div>
+    </div>
+    <script>
+        let date=new Date(); // creates a new date object with the current date and time
+        let year=date.getFullYear(); // gets the current year
+        let month=date.getMonth(); // gets the current month (index based, 0-11)
+        
+        const day=document.querySelector(".calendar-dates"); // selects the element with class "calendar-dates"
+        const currdate=document.querySelector(".calendar-current-date"); // selects the element with class "calendar-current-date"
+        const prenexIcons=document.querySelectorAll(".calendar-navigation span"); // selects all elements with class "calendar-navigation span"
+        
+        const months=[
+        "01월",
+        "02월",
+        "03월",
+        "04월",
+        "05월",
+        "06월",
+        "07월",
+        "08월",
+        "09월",
+        "10월",
+        "11월",
+        "12월"]; // array of month names
+        
+        // function to generate the calendar
+        const manipulate=()=> {
+            // get the first day of the month
+            let dayone=new Date(year, month, 1).getDay();
+        
+            // get the last date of the month
+            let lastdate=new Date(year, month + 1, 0).getDate();
+        
+            // get the day of the last date of the month
+            let dayend=new Date(year, month, lastdate).getDay();
+        
+            // get the last date of the previous month
+            let monthlastdate=new Date(year, month, 0).getDate();
+        
+            let lit=""; // variable to store the generated calendar HTML
+        
+            // loop to add the last dates of the previous month
+            for (let i=dayone; i > 0; i--) {
+        lit+=`<li class="inactive">${monthlastdate - i + 1}</li>`;
+            }
+        
+            // loop to add the dates of the current month
+            for (let i=1; i <=lastdate; i++) {
+        // check if the current date is today
+        let isToday=i===date.getDate() && month===new Date().getMonth() && year===new Date().getFullYear() ? "active": "";
+        lit+=`<li class="${isToday}">${i}</li>`;
+            }
+        
+            // loop to add the first dates of the next month
+            for (let i=dayend; i < 6; i++) {
+        lit+=`<li class="inactive">${i - dayend + 1}</li>`
+            }
+        
+            // update the text of the current date element with the formatted current month and year
+            currdate.innerText=`${months[month]} ${year}년`;
+        
+            // update the HTML of the dates element with the generated calendar
+            day.innerHTML=lit;
+        }
+        
+        manipulate();
+        
+        // Attach a click event listener to each icon
+        prenexIcons.forEach(icon=> {
+        
+        // When an icon is clicked
+        icon.addEventListener("click", ()=> {
+                // Check if the icon is "calendar-prev" or "calendar-next"
+                month=icon.id==="calendar-prev" ? month - 1 : month + 1;
+        
+                // Check if the month is out of range
+                if (month < 0 || month > 11) {
+                    // Set the date to the first day of the month with the new year
+                    date=new Date(year, month, new Date().getDate());
+                    // Set the year to the new year
+                    year=date.getFullYear();
+                    // Set the month to the new month
+                    month=date.getMonth();
+                }
+        
+                else {
+                    // Set the date to the current date
+                    date=new Date();
+                }
+        
+                // Call the manipulate function to update the calendar display
+                manipulate();
+            });
+            });
+    </script>
+
+    <div class="classcontent">
+    	<div style="justify-content: center; display: flex;">
+    	<h2 id="bbtnxt">메뉴</h2>
+    </div>
+    	<div class="buttoncontainer">
+    		<div class="bbutton" onclick="ShowHome()">
+    			<img src="home.png" id="btnicns" />
+    			<a href="#" id="btnnm">홈</a>
+    		</div>
+    		<div class="bbutton" onclick="ShowMaps()">
+    			<img src="Maps.png" id="btnicns" />
+    			<a href="#" id="btnnm">지도</a>
+    		</div>
+    		<div class="bbutton" onclick="ShowNews()">
+    			<img src="news.png" id="btnicns" />
+    			<a href="#" id="btnnm">뉴스</a>
+    		</div>
+    		<div class="bbutton" onclick="ShowReminders()">
+    			<img src="Reminders.png" id="btnicns" />
+    			<a href="#" id="btnnm">레마인더</a>
+    		</div>
+    		<div class="bbutton" onclick="ShowEvents()">
+    			<img src="events.png" id="btnicns" />
+    			<a href="#" id="btnnm">이벤트</a>
+    		</div>
+    		<div class="bbutton">
+    			<img src="settings.png" id="btnicns" />
+    			<a href="#" id="btnnm">설정</a>
+    		</div>
+    		<div class="bbutton" onclick="ShowSec()">
+    			<img src="sec.png" id="btnicns" />
+    			<a href="#" id="btnnm">세튜리티</a>
+    		</div>
+    	</div>
+    </div>
+    <div id="home-container"> 
+    <div class="window">
+    	<div class="titbar">
+    			<a onclick="CloseHome()" id="closebtn" class="fa fa-times-rectangle-o"></a>
+    		<p id="tbxt">홈</p>
+    	</div>
+    	<iframe id="news"src="https://rss.app/embed/v1/wall/tyftbdJqtRgJ2Ma0" frameborder="0"></iframe>
+    </div>
+</div>
+
+    <div id="news-container"> 
+    <div class="window">
+    	<div class="titbar">
+    			<a onclick="CloseNews()" id="closebtn" class="fa fa-times-rectangle-o"></a>
+    		<p id="tbxt">뉴스</p>
+    	</div>
+    	<iframe id="news"src="https://rss.app/embed/v1/wall/TVJMkjQEdZiBeWPU" frameborder="0"></iframe>
+    </div>
+</div>
+
+    <div id="Reminders-container"> 
+    <div class="window">
+    	<div class="titbar">
+    			<a onclick="CloseReminders()" id="closebtn" class="fa fa-times-rectangle-o"></a>
+    		<p id="tbxt">레마인더</p>
+    	</div>
+    	<iframe id="news"src="https://www.zoomeye.org/" frameborder="0"></iframe>
+    </div>
+</div>
+
+    <div id="Maps-container"> 
+    <div class="window">
+    	<div class="titbar">
+    			<a onclick="CloseMaps()" id="closebtn" class="fa fa-times-rectangle-o"></a>
+    		<p id="tbxt">지도</p>
+    	</div>
+    	<iframe id="news"src="https://snazzymaps.com/build-a-map/preview/embed/552763" frameborder="0"></iframe>
+    </div>
+</div>
+
+    <div id="events-container"> 
+    <div class="window">
+    	<div class="titbar">
+    			<a onclick="CloseEvents()" id="closebtn" class="fa fa-times-rectangle-o"></a>
+    		<p id="tbxt">이벤트</p>
+    	</div>
+    	<iframe id="news"src="https://rss.app/embed/v1/wall/tyftbdJqtRgJ2Ma0" frameborder="0"></iframe>
+    </div>
+</div>
+
+    <div id="Sec-container"> 
+    <div class="window">
+    	<div class="titbar">
+    			<a onclick="CloseSec()" id="closebtn" class="fa fa-times-rectangle-o"></a>
+    		<p id="tbxt">세큐리티</p>
+    	</div>
+    	<iframe id="news"src="https://rss.app/embed/v1/wall/tyftbdJqtRgJ2Ma0" frameborder="0"></iframe>
+    </div>
+</div>
+
+<div id="search-container"> 
+    <div class="window">
+        <div class="titbar">
+                <a onclick="CloseSearch()" id="closebtn" class="fa fa-times-rectangle-o"></a>
+            <p id="tbxt">검색</p>
+        </div>
+        <iframe id="searchengine" frameborder="0"></iframe>
+    </div>
+</div>
+
+<div id="Terminal-container"> 
+    <div class="window">
+        <div class="titbar">
+                <a onclick="CloseTerminal()" id="closebtn" class="fa fa-times-rectangle-o"></a>
+            <p id="tbxt">터미날</p>
+        </div>
+        <div id="output"></div>
+         <input id="input" type="text" placeholder="" onkeydown="handleKeyPress(event)">
+         <style type="text/css">
+             #output {
+      padding: 25px 25px;
+      height: 81%;
+      overflow: auto;
+      color:#ccffff;
+      font-size: 20px;
+      font-family: sans-serif;
+      font-weight: lighter;
+      font-style: italic;
+    }
+
+    #input{
+            background: rgba(0, 26, 51, 0.5);
+            color:#ccffff;
+            padding: 5px 5px;
+            border-top: 3px solid #ccffff;
+            font-size: 20px;
+            text-align: left;
+            placeholder-color: blue;
+            backdrop-filter: blur(0px);
+            box-sizing: border-box;
+            width: 100%;
+        }
+         </style>
+         <script>
+    function handleKeyPress(event) {
+      if (event.key === "Enter") {
+        executeCommand();
+      }
+    }
+
+    function executeCommand() {
+      var inputElement = document.getElementById('input');
+      var outputElement = document.getElementById('output');
+      var command = inputElement.value;
+      // Sample if-else logic for specific commands
+      if (command === "clear") {
+        outputElement.innerHTML = '';
+      } else if (command === "about") {
+        outputElement.innerHTML += ">> Security Firmware Terminal[4.8.103423] (C)Derek Justin P. Ronquillo. @2023";
+      } else if (command === "exit") {
+        outputElement.innerHTML = '';
+        inputElement.value = '';
+        CloseTerminal();
+      }
+      else if (command === "Run Program") {
+        ShowProgram();
+        CloseTerminal()
+      } else if (command === "Run News") {
+        ShowNews();
+        CloseTerminal()
+      }
+      else if (command === "Run Home") {
+        ShowHome();
+        CloseTerminal()
+      }
+      else if (command === "Run Search") {
+        ShowSearch();
+        CloseTerminal()
+      }
+      else if (command === "Run Maps") {
+        ShowMaps();
+        CloseTerminal()
+      }
+      else if (command === "Run Security") {
+        ShowSec();
+        CloseTerminal()
+      }
+      else if (command === "Run Events") {
+        ShowEvents();
+        CloseTerminal()
+      }
+      else if (command === "Run Reminders") {
+        ShowReminders();
+        CloseTerminal()
+      } else {
+        outputElement.innerHTML += "> Command not recognized. Type 'help' for available commands.<br>";
+      }
+
+      // Clear the input field
+      inputElement.value = '';
+      
+      // Scroll to the bottom to show the latest output
+      outputElement.scrollTop = outputElement.scrollHeight;
+    }
+  </script>
+    </div>
+</div>
+
+<div id="Program-container"> 
+    <div class="window">
+        <div class="titbar">
+                <a onclick="CloseProgram()" id="closebtn" class="fa fa-times-rectangle-o"></a>
+            <p id="tbxt">Program</p>
+        </div>
+        <iframe id="news" src="https://vscode.dev/" frameborder="0"></iframe>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function ShowSearch(){
+        document.getElementById("search-container").style.display = "block";
+    }
+    function CloseSearch(){
+        document.getElementById("search-container").style.display = "none";
+    }
+    function ShowTerminal(){
+        document.getElementById("Terminal-container").style.display = "block";
+    }
+    function CloseTerminal(){
+        document.getElementById("Terminal-container").style.display = "none";
+    }
+    function ShowProgram(){
+        document.getElementById("Program-container").style.display = "block";
+    }
+    function CloseProgram(){
+        document.getElementById("Program-container").style.display = "none";
+    }
+	function ShowNews(){
+		document.getElementById("news-container").style.display = "block";
+	}
+	function CloseNews(){
+		document.getElementById("news-container").style.display = "none";
+	}
+	function ShowHome(){
+		document.getElementById("home-container").style.display = "block";
+	}
+	function CloseHome(){
+		document.getElementById("home-container").style.display = "none";
+	}
+	function ShowReminders(){
+		document.getElementById("Reminders-container").style.display = "block";
+	}
+	function CloseReminders(){
+		document.getElementById("Reminders-container").style.display = "none";
+	}
+	function ShowMaps(){
+		document.getElementById("Maps-container").style.display = "block";
+	}
+	function CloseMaps(){
+		document.getElementById("Maps-container").style.display = "none";
+	}
+	function ShowSec(){
+		document.getElementById("Sec-container").style.display = "block";
+	}
+	function CloseSec(){
+		document.getElementById("Sec-container").style.display = "none";
+	}
+	function ShowEvents(){
+		document.getElementById("events-container").style.display = "block";
+	}
+	function CloseEvents(){
+		document.getElementById("events-container").style.display = "none";
+	}
+</script>
+</body>
+</html>
